@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decrypt Base64 To Text</title>
+    <!-- Include Bootstrap CSS from CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="header">
+            <h1>Decrypt Base64 To Text</h1>
+            <button onclick="goBack()" class="btn btn-secondary">Back to Home</button> <!-- Positioned back button -->
+        </div>
+        <div class="mb-3">
+            <label for="inputText" class="form-label">Input (Base64)</label>
+            <input type="text" class="form-control" id="inputText" placeholder="Enter Base64 text to decrypt">
+        </div>
+        <div class="mb-3">
+            <label for="outputText" class="form-label">Output (Text)</label>
+            <input type="text" class="form-control" id="outputText" placeholder="Decrypted output will appear here" readonly>
+        </div>
+        <button onclick="decryptFromBase64()" class="btn btn-primary">Decrypt</button>
+    </div>
+
+    <!-- Include Bootstrap Bundle JS from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check for user authentication on page load
+        window.onload = function() {
+            if (!localStorage.getItem('userData')) {
+                window.location.href = 'login.html'; // Redirect to login if not authenticated
+            }
+        };
+
+        function decryptFromBase64() {
+            var inputText = document.getElementById('inputText').value;
+            if (!inputText.trim()) {
+                alert("Please enter some Base64 encoded text to decrypt.");
+                return;
+            }
+
+            fetch('http://localhost:3001/api/decode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ encoded: inputText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    document.getElementById('outputText').value = data.decoded;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to connect to the server. Please try again later.');
+            });
+        }
+
+        function goBack() {
+            window.location.href = 'index.html'; // Navigate back to the index page
+        }
+    </script>
+</body>
+</html>
